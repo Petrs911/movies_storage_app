@@ -23,7 +23,11 @@ class MovieBloc extends Bloc<MovieEvent, MovieState> {
       try {
         final List<MoviesModel> movieList =
             await moviesRepository.getMovies(event.movieName);
-        yield MovieLoadedState(movieList: movieList);
+        if (movieList.isEmpty) {
+          yield MovieLoadedEmptyListState(movieName: event.movieName);
+        } else {
+          yield MovieLoadedState(movieList: movieList);
+        }
       } catch (e) {
         yield MovieErrorState(error: e.toString());
       }

@@ -31,6 +31,7 @@ class _MovieSelectionState extends State<MovieSelection> {
             IconButton(
               icon: Icon(Icons.search),
               onPressed: () {
+                if (_textController.text.isEmpty) return;
                 Navigator.pop(context, _textController.text);
               },
             )

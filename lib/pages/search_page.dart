@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:movies_storage_app/bloc/movie_bloc.dart';
+import 'package:movies_storage_app/blocs/movie_bloc.dart';
 import 'package:movies_storage_app/pages/home_page.dart';
 import 'package:movies_storage_app/pages/movie_selection.dart';
+import 'package:movies_storage_app/pages/settings.dart';
 
 class SearchPage extends StatelessWidget {
   @override
@@ -12,6 +13,15 @@ class SearchPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Movie Search'),
         actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Settings(),
+              ),
+            ),
+          ),
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () async {
@@ -22,8 +32,9 @@ class SearchPage extends StatelessWidget {
                 ),
               );
               if (movieName != null) {
-                BlocProvider.of<MovieBloc>(context)
-                    .add(GetMoviesEvent(movieName: movieName));
+                BlocProvider.of<MovieBloc>(context).add(
+                  GetMoviesEvent(movieName: movieName),
+                );
               }
             },
           )
@@ -40,13 +51,19 @@ class SearchPage extends StatelessWidget {
             if (state is MovieLoadingState) {
               return Center(child: CircularProgressIndicator());
             }
+            if (state is MovieLoadedEmptyListState) {
+              return Center(
+                child: Text(
+                    'Извинте не удалось найти данный фильм: "${state.movieName}"'),
+              );
+            }
             if (state is MovieLoadedState) {
               final movieList = state.movieList;
 
               return ListView.builder(
                 itemCount: movieList.length,
                 itemBuilder: (context, index) =>
-                    MyHomePage(movie: movieList[index]),
+                    MyHomePage(movie: movieList[index], index: index),
               );
             }
             if (state is MovieErrorState) {

@@ -16,6 +16,13 @@ class MovieLoadedState extends MovieState {
       : assert(movieList != null);
 }
 
+class MovieLoadedEmptyListState extends MovieState {
+  final String movieName;
+
+  const MovieLoadedEmptyListState({@required this.movieName})
+      : assert(movieName != null);
+}
+
 class MovieErrorState extends MovieState {
   final String error;
   const MovieErrorState({@required this.error});
