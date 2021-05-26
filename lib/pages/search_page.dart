@@ -6,12 +6,19 @@ import 'package:movies_storage_app/pages/home_page.dart';
 import 'package:movies_storage_app/pages/movie_selection.dart';
 import 'package:movies_storage_app/pages/settings.dart';
 
-class SearchPage extends StatelessWidget {
+class SearchPage extends StatefulWidget {
+  @override
+  _SearchPageState createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+  bool toogler = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Movie Search'),
+        title: Text('Поиск фильмов'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
@@ -25,6 +32,7 @@ class SearchPage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () async {
+              setState(() => toogler = true);
               final movieName = await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -45,7 +53,7 @@ class SearchPage extends StatelessWidget {
           builder: (context, state) {
             if (state is MovieInitial) {
               return Center(
-                child: Text('Please select a movie'),
+                child: Text('Пожалуйста введите название фильма'),
               );
             }
             if (state is MovieLoadingState) {
@@ -54,20 +62,51 @@ class SearchPage extends StatelessWidget {
             if (state is MovieLoadedEmptyListState) {
               return Center(
                 child: Text(
-                    'Извинте не удалось найти данный фильм: "${state.movieName}"'),
+                    'Извините не удалось найти данный фильм: "${state.movieName}"'),
               );
             }
             if (state is MovieLoadedState) {
               final movieList = state.movieList;
 
-              return ListView.builder(
-                itemCount: movieList.length,
-                itemBuilder: (context, index) =>
-                    MyHomePage(movie: movieList[index], index: index),
+              return Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text('Найденно фильмов: ${movieList.length}'),
+                      OutlinedButton(
+                        onPressed: () {
+                          if (toogler) {
+                            movieList.sort(
+                                (a, b) => b.releseDate.compareTo(a.releseDate));
+                            setState(() {});
+                            toogler = false;
+                          } else {
+                            movieList.sort(
+                                (a, b) => a.releseDate.compareTo(b.releseDate));
+                            setState(() {});
+                            toogler = true;
+                          }
+                        },
+                        child:
+                            Text(toogler ? 'Сначала новые' : 'Сначала старые'),
+                      ),
+                    ],
+                  ),
+                  //SizedBox(height: 10.0),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: movieList.length,
+                      itemBuilder: (context, index) =>
+                          MyHomePage(movie: movieList[index], index: index),
+                    ),
+                  ),
+                ],
               );
             }
             if (state is MovieErrorState) {
-              return Text('Упс, что-то пошло не так\n${state.error}');
+              return Center(
+                  child: Text('Упс, что-то пошло не так\n${state.error}'));
             }
           },
         ),

@@ -12,7 +12,7 @@ class _MovieSelectionState extends State<MovieSelection> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Фильм'),
+        title: Text('Поиск фильма'),
       ),
       body: Form(
         child: Row(

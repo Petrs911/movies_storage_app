@@ -35,7 +35,7 @@ class MyHomePage extends StatelessWidget {
             ),
       title: Text('${movie.title}'),
       subtitle: Text('${movie.originalTitle}'),
-      trailing: Text('${movie.releseDate}'),
+      trailing: Text(movie.releseDate == 1 ? '' : '${movie.releseDate}'),
     );
   }
 }
