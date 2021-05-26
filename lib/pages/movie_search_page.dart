@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class MovieSelection extends StatefulWidget {
+class MovieSearch extends StatefulWidget {
   @override
-  _MovieSelectionState createState() => _MovieSelectionState();
+  _MovieSearchState createState() => _MovieSearchState();
 }
 
-class _MovieSelectionState extends State<MovieSelection> {
+class _MovieSearchState extends State<MovieSearch> {
   final TextEditingController _textController = TextEditingController();
 
   @override

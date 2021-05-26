@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:movies_storage_app/blocs/movie_bloc.dart';
 import 'package:movies_storage_app/blocs/theme_bloc.dart';
 import 'package:movies_storage_app/provider/provider.dart';
-import 'package:movies_storage_app/pages/search_page.dart';
+import 'package:movies_storage_app/pages/home_page.dart';
 import 'package:movies_storage_app/repository/movies_repository.dart';
 
 void main() {
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
           title: 'Movie app',
           home: BlocProvider(
             create: (context) => MovieBloc(moviesRepository: moviesRepository),
-            child: SearchPage(),
+            child: HomePage(),
           ),
         );
       },

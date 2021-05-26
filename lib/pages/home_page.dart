@@ -1,41 +1,116 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:movies_storage_app/model/movie_model.dart';
-import 'package:movies_storage_app/pages/fullscreen_image.dart';
-import 'package:movies_storage_app/consts/default_image.dart';
+import 'package:movies_storage_app/blocs/movie_bloc.dart';
+import 'package:movies_storage_app/pages/movie_listtile.dart';
+import 'package:movies_storage_app/pages/movie_search_page.dart';
+import 'package:movies_storage_app/pages/settings.dart';
 
-class MyHomePage extends StatelessWidget {
-  final MoviesModel movie;
-  final int index;
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
 
-  MyHomePage({Key key, @required this.index, @required this.movie})
-      : assert(movie != null, index != null),
-        super(key: key);
+class _HomePageState extends State<HomePage> {
+  bool toogler = true;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: movie.image == null
-          ? defaultImg
-          : GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => FullscreenImage(
-                        'https://image.tmdb.org/t/p/original${movie.image}'),
-                  ),
-                );
-              },
-              child: Hero(
-                tag: 'image$index',
-                child: Image.network(
-                    'https://image.tmdb.org/t/p/w200${movie.image}'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Поиск фильмов'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Settings(),
               ),
             ),
-      title: Text('${movie.title}'),
-      subtitle: Text('${movie.originalTitle}'),
-      trailing: Text(movie.releseDate == 1 ? '' : '${movie.releseDate}'),
+          ),
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () async {
+              setState(() => toogler = true);
+              final movieName = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MovieSearch(),
+                ),
+              );
+              if (movieName != null) {
+                BlocProvider.of<MovieBloc>(context).add(
+                  GetMoviesEvent(movieName: movieName),
+                );
+              }
+            },
+          )
+        ],
+      ),
+      body: Center(
+        child: BlocBuilder<MovieBloc, MovieState>(
+          builder: (context, state) {
+            if (state is MovieInitial) {
+              return Center(
+                child: Text('Пожалуйста введите название фильма'),
+              );
+            }
+            if (state is MovieLoadingState) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (state is MovieLoadedEmptyListState) {
+              return Center(
+                child: Text(
+                    'Извините не удалось найти данный фильм: "${state.movieName}"'),
+              );
+            }
+            if (state is MovieLoadedState) {
+              final movieList = state.movieList;
+
+              return Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text('Найденно фильмов: ${movieList.length}'),
+                      OutlinedButton(
+                        onPressed: () {
+                          if (toogler) {
+                            movieList.sort(
+                                (a, b) => b.releseDate.compareTo(a.releseDate));
+                            setState(() {});
+                            toogler = false;
+                          } else {
+                            movieList.sort(
+                                (a, b) => a.releseDate.compareTo(b.releseDate));
+                            setState(() {});
+                            toogler = true;
+                          }
+                        },
+                        child:
+                            Text(toogler ? 'Сначала новые' : 'Сначала старые'),
+                      ),
+                    ],
+                  ),
+                  //SizedBox(height: 10.0),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: movieList.length,
+                      itemBuilder: (context, index) =>
+                          MovieListTile(movie: movieList[index], index: index),
+                    ),
+                  ),
+                ],
+              );
+            }
+            if (state is MovieErrorState) {
+              return Center(
+                  child: Text('Упс, что-то пошло не так\n${state.error}'));
+            }
+          },
+        ),
+      ),
     );
   }
 }
