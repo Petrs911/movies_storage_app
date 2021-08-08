@@ -8,14 +8,16 @@ class FullscreenImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        child: Center(
-          child: Hero(
-            tag: 'imageHero',
-            child: Image.network(this.img),
+      body: SafeArea(
+        child: GestureDetector(
+          child: Center(
+            child: Hero(
+              tag: 'imageHero',
+              child: Image.network(img),
+            ),
           ),
+          onTap: () => Navigator.pop(context),
         ),
-        onTap: () => Navigator.pop(context),
       ),
     );
   }

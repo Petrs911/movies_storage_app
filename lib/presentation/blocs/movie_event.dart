@@ -8,5 +8,5 @@ abstract class MovieEvent {
 class GetMoviesEvent extends MovieEvent {
   final String movieName;
 
-  const GetMoviesEvent({@required this.movieName}) : assert(movieName != null);
+  const GetMoviesEvent({required this.movieName});
 }

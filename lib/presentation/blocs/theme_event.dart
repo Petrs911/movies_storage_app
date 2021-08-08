@@ -6,3 +6,5 @@ abstract class ThemeEvent {
 }
 
 class ThemeChanged extends ThemeEvent {}
+
+class GetSavedTheme extends ThemeEvent {}

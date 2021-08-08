@@ -10,20 +10,18 @@ class MovieInitial extends MovieState {}
 class MovieLoadingState extends MovieState {}
 
 class MovieLoadedState extends MovieState {
-  final List<MoviesModel> movieList;
+  final List<MovieModel> movieList;
 
-  const MovieLoadedState({@required this.movieList})
-      : assert(movieList != null);
+  const MovieLoadedState({required this.movieList});
 }
 
 class MovieLoadedEmptyListState extends MovieState {
   final String movieName;
 
-  const MovieLoadedEmptyListState({@required this.movieName})
-      : assert(movieName != null);
+  const MovieLoadedEmptyListState({required this.movieName});
 }
 
 class MovieErrorState extends MovieState {
   final String error;
-  const MovieErrorState({@required this.error});
+  const MovieErrorState({required this.error});
 }
