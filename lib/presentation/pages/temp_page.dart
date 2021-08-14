@@ -4,7 +4,7 @@ import 'package:movies_storage_app/models/hive_model.dart';
 class TempPage extends StatelessWidget {
   TempPage({Key? key, required this.itemsList}) : super(key: key);
 
-  final List<HiveModel> itemsList;
+  final List<HiveFilmModel> itemsList;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class TempPage extends StatelessWidget {
                 return ListTile(
                   title: Text(itemsList[index].originalTitle),
                   trailing:
-                      Text(itemsList[index].realeseDate?.year.toString() ?? ''),
+                      Text(itemsList[index].releseDate?.year.toString() ?? ''),
                 );
               }),
         ),

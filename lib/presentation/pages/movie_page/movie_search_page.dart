@@ -21,6 +21,13 @@ class _MovieSearchState extends State<MovieSearch> {
               child: Padding(
                 padding: EdgeInsets.only(left: 10.0),
                 child: TextFormField(
+                  autofocus: true,
+                  onFieldSubmitted: (String? str) {
+                    if (str != null) {
+                      if (str.isEmpty) return;
+                      Navigator.pop(context, str);
+                    }
+                  },
                   controller: _textController,
                   decoration: InputDecoration(
                     labelText: 'Поиск',

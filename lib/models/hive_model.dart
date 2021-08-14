@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 
 part 'hive_model.g.dart';
 
 @HiveType(typeId: 0)
-class HiveModel {
+class HiveFilmModel {
   @HiveField(0)
   final String originalTitle;
 
@@ -12,15 +11,31 @@ class HiveModel {
   final String title;
 
   @HiveField(2)
-  final DateTime? realeseDate;
+  final DateTime? releseDate;
 
   @HiveField(3)
   final String? posterPath;
 
-  HiveModel({
+  HiveFilmModel({
     required this.originalTitle,
     required this.title,
-    required this.realeseDate,
+    required this.releseDate,
     required this.posterPath,
   });
+
+  @override
+  bool operator ==(other) {
+    return (other is HiveFilmModel) &&
+        other.originalTitle == originalTitle &&
+        other.posterPath == posterPath &&
+        other.releseDate == releseDate &&
+        other.title == title;
+  }
+
+  @override
+  int get hashCode =>
+      originalTitle.hashCode ^
+      title.hashCode ^
+      releseDate.hashCode ^
+      posterPath.hashCode;
 }

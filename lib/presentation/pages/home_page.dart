@@ -7,7 +7,8 @@ import 'package:movies_storage_app/models/movie_model.dart';
 
 import 'package:movies_storage_app/presentation/blocs/movie_bloc.dart';
 import 'package:movies_storage_app/presentation/pages/movie_listtile.dart';
-import 'package:movies_storage_app/presentation/pages/movie_search_page.dart';
+import 'package:movies_storage_app/presentation/pages/movie_page/movie_full_info.dart';
+import 'package:movies_storage_app/presentation/pages/movie_page/movie_search_page.dart';
 import 'package:movies_storage_app/presentation/pages/settings.dart';
 import 'package:movies_storage_app/presentation/pages/temp_page.dart';
 
@@ -19,24 +20,28 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool toogler = true;
 
-  List<HiveModel> _itemsList = <HiveModel>[];
+  List<HiveFilmModel> _savedMoviesList = <HiveFilmModel>[];
 
-  Future<void> addItem(HiveModel item) async {
-    var box = await Hive.openBox<HiveModel>('item');
+  final SnackBar _snackBar = SnackBar(
+    content: const Text('Данный фильм уже добавлен в вашу библиотеку'),
+    action: SnackBarAction(
+      label: 'OK',
+      onPressed: () {},
+    ),
+  );
 
+  void getItems() {
+    Box box = Hive.box<HiveFilmModel>('moviesList');
+    _savedMoviesList = box.values.toList() as List<HiveFilmModel>;
+  }
+
+  void addItem(HiveFilmModel item) {
+    var box = Hive.box<HiveFilmModel>('moviesList');
     box.add(item);
   }
 
-  Future<void> getItem() async {
-    Box box = await Hive.openBox<HiveModel>('item');
-    _itemsList = box.values.toList() as List<HiveModel>;
-  }
-
-  int stringToint(MovieModel movieModel) {
-    int movieRealeseDate =
-        int.parse(movieModel.releseDate?.year.toString() ?? '0');
-    return movieRealeseDate;
-  }
+  int stringToint(MovieModel movieModel) =>
+      int.parse(movieModel.releseDate?.year.toString() ?? '0');
 
   @override
   Widget build(BuildContext context) {
@@ -55,13 +60,13 @@ class _HomePageState extends State<HomePage> {
           ),
           IconButton(
               icon: Icon(Icons.add),
-              onPressed: () async {
-                await getItem();
+              onPressed: () {
+                getItems();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => TempPage(
-                      itemsList: _itemsList,
+                      itemsList: _savedMoviesList,
                     ),
                   ),
                 );
@@ -131,43 +136,31 @@ class _HomePageState extends State<HomePage> {
                     child: ListView.builder(
                       itemCount: movieList.length,
                       itemBuilder: (context, index) => MovieListTile(
-                        onTap: () async {
-                          final SnackBar snackBar = SnackBar(
-                            backgroundColor: Colors.red,
-                            content: const Text(
-                                'Данный фильм уже добавлен в вашу библиотеку'),
-                            action: SnackBarAction(
-                              label: 'OK',
-                              onPressed: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  MovieFullInfo(movie: movieList[index]),
                             ),
                           );
-
-                          await getItem();
-                          if (_itemsList.isEmpty) {
-                            addItem(HiveModel(
-                              posterPath: movieList[index].posterPath,
-                              title: movieList[index].title,
-                              originalTitle: movieList[index].originalTitle,
-                              realeseDate: movieList[index].releseDate,
-                            ));
-                          }
-                          _itemsList.forEach((HiveModel hiveModel) async {
-                            if (hiveModel.originalTitle ==
-                                    movieList[index].originalTitle &&
-                                hiveModel.realeseDate ==
-                                    movieList[index].releseDate) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackBar);
-                            } else {
-                              await addItem(HiveModel(
-                                posterPath: movieList[index].posterPath,
-                                title: movieList[index].title,
-                                originalTitle: movieList[index].originalTitle,
-                                realeseDate: movieList[index].releseDate,
-                              ));
-                            }
-                          });
                         },
+                        // onTap: () {
+                        //   getItems();
+                        //   HiveFilmModel film = HiveFilmModel(
+                        //     originalTitle: movieList[index].originalTitle,
+                        //     title: movieList[index].title,
+                        //     releseDate: movieList[index].releseDate,
+                        //     posterPath: movieList[index].posterPath,
+                        //   );
+                        //   if (_savedMoviesList.contains(film)) {
+                        //     ScaffoldMessenger.of(context)
+                        //         .showSnackBar(_snackBar);
+                        //   } else {
+                        //     addItem(film);
+                        //     print('newFilm');
+                        //   }
+                        // },
                         movie: movieList[index],
                         index: index,
                       ),
