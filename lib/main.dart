@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_storage_app/models/hive_model.dart';
 import 'package:movies_storage_app/presentation/blocs/movie_bloc.dart';
@@ -14,6 +15,12 @@ import 'package:movies_storage_app/provider/provider.dart';
 import 'package:movies_storage_app/repository/movies_repository.dart';
 
 Future<void> main() async {
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+    ),
+  );
+
   WidgetsFlutterBinding.ensureInitialized();
   final Directory directory = await getApplicationDocumentsDirectory();
 
@@ -41,7 +48,15 @@ class MyApp extends StatelessWidget {
         builder: (_, Box box, child) {
           final bool savedTheme = box.get('isThemeLight', defaultValue: false);
           return MaterialApp(
-            theme: savedTheme ? ThemeData.dark() : ThemeData.light(),
+            theme: ThemeData(
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                  style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+              )),
+              primaryColor: Colors.black,
+              brightness: Brightness.dark,
+            ),
+            debugShowCheckedModeBanner: false,
             title: 'Movie app',
             home: BlocProvider(
               create: (context) {
