@@ -28,13 +28,14 @@ class _MovieFullInfoState extends State<MovieFullInfo>
     _offsetDx =
         Tween<double>(begin: 85, end: -200).animate(_colorAnimationController);
     _offsetDy =
-        Tween<double>(begin: 185, end: 50).animate(_colorAnimationController);
+        Tween<double>(begin: 175, end: 30).animate(_colorAnimationController);
   }
 
   bool _scrollListener(ScrollNotification scrollNotification) {
     if (scrollNotification.metrics.axis == Axis.vertical) {
+      print(scrollNotification.metrics.pixels);
       _colorAnimationController
-          .animateTo(scrollNotification.metrics.pixels / 140);
+          .animateTo(scrollNotification.metrics.pixels / 150);
 
       return true;
     }
@@ -67,14 +68,6 @@ class _MovieFullInfoState extends State<MovieFullInfo>
                       height: 300,
                       color: Colors.green,
                     ),
-                    Container(
-                      height: 300,
-                      color: Colors.red,
-                    ),
-                    Container(
-                      height: 300,
-                      color: Colors.green,
-                    ),
                   ],
                 ),
                 AnimatedBuilder(
@@ -83,14 +76,33 @@ class _MovieFullInfoState extends State<MovieFullInfo>
                     left: _offsetDx.value,
                     top: _offsetDy.value,
                     child: Container(
-                      width: 200,
-                      height: 40,
-                      color: Colors.blue,
+                      width: MediaQuery.of(context).size.width * 0.52,
+                      height: 50,
+                      child: const Center(
+                        child: Text(
+                          '9.7',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(
+                            blurRadius: 20,
+                            spreadRadius: 3,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.1,
+                  height: MediaQuery.of(context).size.height * 0.09,
                   child: AnimatedBuilder(
                     animation: _colorAnimationController,
                     builder: (_, Widget? child) => AppBar(
