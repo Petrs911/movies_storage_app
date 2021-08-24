@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:movies_storage_app/models/movie_model.dart';
-import 'package:movies_storage_app/provider/provider.dart';
+import 'package:movies_storage_app/provider/dio_client.dart';
 
 class MoviesRepository {
-  final MoviesProvider moviesProvider;
+  final DioClient _dioClient;
 
-  MoviesRepository({required this.moviesProvider});
+  MoviesRepository(this._dioClient);
 
   Future<List<MovieModel>> getMovies(String movieName) async {
-    return moviesProvider.fetchMovie(movieName);
+    return _dioClient.getMoviesList(movieName: movieName);
   }
 }

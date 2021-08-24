@@ -7,7 +7,7 @@ import 'package:movies_storage_app/models/movie_model.dart';
 
 import 'package:movies_storage_app/presentation/blocs/movie_bloc.dart';
 import 'package:movies_storage_app/presentation/pages/movie_listtile.dart';
-import 'package:movies_storage_app/presentation/pages/movie_page/movie_full_info.dart';
+import 'package:movies_storage_app/presentation/pages/movie_page/components/movie_full_info.dart';
 import 'package:movies_storage_app/presentation/pages/movie_page/movie_search_page.dart';
 import 'package:movies_storage_app/presentation/pages/settings.dart';
 import 'package:movies_storage_app/presentation/pages/temp_page.dart';
