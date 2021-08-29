@@ -33,5 +33,13 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  fonts:
+    - family: Questrial
+      fonts: 
+        - asset: assets/fonts/Questrial/Questrial-Regular.ttf
+    - family: Press_Start_2P
+      fonts: 
+        - asset: assets/fonts/Press_Start_2P/PressStart2P-Regular.ttf
+
   assets:
     - assets/images/

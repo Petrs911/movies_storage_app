@@ -4,23 +4,38 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive/hive.dart';
 import 'package:movies_storage_app/models/hive_model.dart';
 import 'package:movies_storage_app/models/movie_model.dart';
+import 'package:movies_storage_app/presentation/blocs/actorss_bloc/bloc.dart';
+import 'package:movies_storage_app/presentation/blocs/movie_bloc/bloc.dart'
+    as movieBloc;
 
-import 'package:movies_storage_app/presentation/blocs/movie_bloc.dart';
 import 'package:movies_storage_app/presentation/pages/movie_listtile.dart';
 import 'package:movies_storage_app/presentation/pages/movie_page/components/movie_full_info.dart';
 import 'package:movies_storage_app/presentation/pages/movie_page/movie_search_page.dart';
 import 'package:movies_storage_app/presentation/pages/settings.dart';
 import 'package:movies_storage_app/presentation/pages/temp_page.dart';
+import 'package:movies_storage_app/repository/movies_repository.dart';
 
 class HomePage extends StatefulWidget {
+  final MoviesRepository moviesRepository;
+
+  const HomePage({required this.moviesRepository});
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  late final ActorsBloc _actorsBloc;
+
   bool toogler = true;
 
   List<HiveFilmModel> _savedMoviesList = <HiveFilmModel>[];
+
+  @override
+  void initState() {
+    super.initState();
+    _actorsBloc = ActorsBloc(moviesRepository: widget.moviesRepository);
+  }
 
   final SnackBar _snackBar = SnackBar(
     content: const Text('Данный фильм уже добавлен в вашу библиотеку'),
@@ -82,8 +97,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               );
               if (movieName != null) {
-                BlocProvider.of<MovieBloc>(context).add(
-                  GetMoviesEvent(movieName: movieName),
+                BlocProvider.of<movieBloc.MovieBloc>(context).add(
+                  movieBloc.GetMoviesEvent(movieName: movieName),
                 );
               }
             },
@@ -91,20 +106,20 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: Center(
-        child: BlocBuilder<MovieBloc, MovieState>(
+        child: BlocBuilder<movieBloc.MovieBloc, movieBloc.MoviesState>(
           builder: (context, state) {
-            if (state is MovieInitial) {
+            if (state is movieBloc.InitialState) {
               return Center(
                 child: Text('Пожалуйста введите название фильма'),
               );
             }
-            if (state is MovieLoadedEmptyListState) {
+            if (state is movieBloc.MovieLoadedEmptyListState) {
               return Center(
                 child: Text(
                     'Извините не удалось найти данный фильм: "${state.movieName}"'),
               );
             }
-            if (state is MovieLoadedState) {
+            if (state is movieBloc.MovieLoadedState) {
               final movieList = state.movieList;
 
               return Column(
@@ -137,11 +152,18 @@ class _HomePageState extends State<HomePage> {
                       itemCount: movieList.length,
                       itemBuilder: (context, index) => MovieListTile(
                         onTap: () {
+                          _actorsBloc.add(
+                            GetActorsEvent(movieId: movieList[index].movieId),
+                          );
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) =>
-                                  MovieFullInfo(movie: movieList[index]),
+                              builder: (_) => BlocProvider(
+                                create: (_) {
+                                  return _actorsBloc;
+                                },
+                                child: MovieFullInfo(movie: movieList[index]),
+                              ),
                             ),
                           );
                         },
@@ -169,7 +191,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               );
             }
-            if (state is MovieErrorState) {
+            if (state is movieBloc.MovieErrorState) {
               return SizedBox(
                 width: MediaQuery.of(context).size.width * 0.9,
                 child: Text(

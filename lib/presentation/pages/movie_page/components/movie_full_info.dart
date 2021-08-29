@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:movies_storage_app/consts/default_image.dart';
 import 'package:movies_storage_app/models/movie_model.dart';
+import 'package:movies_storage_app/presentation/blocs/actorss_bloc/bloc.dart';
+import 'package:movies_storage_app/styles/text_style.dart';
 
 class MovieFullInfo extends StatefulWidget {
   const MovieFullInfo({Key? key, required this.movie}) : super(key: key);
@@ -33,7 +38,6 @@ class _MovieFullInfoState extends State<MovieFullInfo>
 
   bool _scrollListener(ScrollNotification scrollNotification) {
     if (scrollNotification.metrics.axis == Axis.vertical) {
-      print(scrollNotification.metrics.pixels);
       _colorAnimationController
           .animateTo(scrollNotification.metrics.pixels / 150);
 
@@ -46,29 +50,80 @@ class _MovieFullInfoState extends State<MovieFullInfo>
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: NotificationListener(
           onNotification: _scrollListener,
           child: SizedBox(
             height: double.infinity,
             child: Stack(
               children: <Widget>[
-                ListView(
-                  children: <Widget>[
-                    AspectRatio(
-                      aspectRatio: 16 / 9,
-                      child: Image.network(widget.movie.backdropPath != null
-                          ? 'https://image.tmdb.org/t/p/original${widget.movie.backdropPath}'
-                          : imgNotFoundUrl),
-                    ),
-                    Container(
-                      height: 300,
-                      color: Colors.red,
-                    ),
-                    Container(
-                      height: 300,
-                      color: Colors.green,
-                    ),
-                  ],
+                ScrollConfiguration(
+                  behavior: _MyCustomScrollBehavior(),
+                  child: ListView(
+                    children: <Widget>[
+                      AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: Image.network(widget.movie.backdropPath != null
+                            ? 'https://image.tmdb.org/t/p/original${widget.movie.backdropPath}'
+                            : imgNotFoundUrl),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 55),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15.0, right: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(widget.movie.title, style: title),
+                            const SizedBox(height: 20),
+                            Text(widget.movie.overview, style: description),
+                            const SizedBox(height: 20),
+                            Text('Оригинальное название',
+                                style: mediumGreyTitle),
+                            const SizedBox(height: 10),
+                            Text(
+                              widget.movie.originalTitle,
+                              style: description,
+                            ),
+                            BlocBuilder<ActorsBloc, ActorsState>(
+                              builder: (_, ActorsState state) {
+                                if (state is LoadedState) {
+                                  return SizedBox(
+                                      // child: ListView.builder(
+                                      //   physics:
+                                      //       const NeverScrollableScrollPhysics(),
+                                      //   shrinkWrap: true,
+                                      //   itemCount: state.actorsList.length,
+                                      //   itemBuilder: (_, int index) => Text(
+                                      //     state.actorsList[index].name,
+                                      //     style: description,
+                                      //   ),
+                                      // ),
+                                      );
+                                }
+                                if (state is ErrorState) {
+                                  return SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    child: Text(
+                                      'Упс, что-то пошло не так\n${state.error}',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  );
+                                }
+
+                                return CircularProgressIndicator();
+                              },
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.width,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 AnimatedBuilder(
                   animation: _colorAnimationController,
@@ -78,9 +133,9 @@ class _MovieFullInfoState extends State<MovieFullInfo>
                     child: Container(
                       width: MediaQuery.of(context).size.width * 0.52,
                       height: 50,
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          '9.7',
+                          widget.movie.voteAverage.toString(),
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 24,
@@ -123,7 +178,9 @@ class _MovieFullInfoState extends State<MovieFullInfo>
             height: 50,
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                print(widget.movie.movieId);
+              },
               child: Text('Добавить в библиотеку'),
             ),
           ),

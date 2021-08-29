@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies_storage_app/models/hive_model.dart';
-import 'package:movies_storage_app/presentation/blocs/movie_bloc.dart';
+import 'package:movies_storage_app/presentation/blocs/movie_bloc/bloc.dart';
 import 'package:movies_storage_app/provider/dio_client.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hive/hive.dart';
@@ -42,6 +42,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
+        fontFamily: 'Questrial',
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
@@ -59,7 +60,7 @@ class MyApp extends StatelessWidget {
         create: (context) {
           return MovieBloc(moviesRepository: moviesRepository);
         },
-        child: HomePage(),
+        child: HomePage(moviesRepository: moviesRepository),
       ),
     );
   }
